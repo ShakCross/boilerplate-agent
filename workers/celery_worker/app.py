@@ -13,6 +13,8 @@ app = Celery(
 )
 
 # Configure Celery
+import sys
+
 app.conf.update(
     task_serializer='json',
     accept_content=['json'],
@@ -27,6 +29,13 @@ app.conf.update(
     task_acks_late=True,
     worker_max_tasks_per_child=100,
 )
+
+# Windows-specific configuration to avoid PermissionError
+if sys.platform == 'win32':
+    app.conf.update(
+        worker_pool='solo',  # Use solo pool instead of prefork on Windows
+        worker_concurrency=1,  # Single worker to avoid multiprocessing issues
+    )
 
 if __name__ == '__main__':
     app.start()

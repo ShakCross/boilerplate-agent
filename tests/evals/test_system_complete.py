@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script completo para probar el sistema AI Agent.
-Ejecuta: python test_system_complete.py
+Complete script to test the AI Agent system.
+Run: python test_system_complete.py
 """
 
 import requests
@@ -19,8 +19,8 @@ def print_step(step, title):
     print("-" * 30)
 
 def test_api_connectivity():
-    """Test básico de conectividad."""
-    print_step(1, "CONECTIVIDAD BÁSICA")
+    """Basic connectivity test."""
+    print_step(1, "BASIC CONNECTIVITY")
     
     try:
         response = requests.get('http://localhost:8000/health', timeout=5)
@@ -31,95 +31,95 @@ def test_api_connectivity():
             print(f"✅ Response: {data}")
             return True
         else:
-            print("❌ API no responde correctamente")
+            print("❌ API not responding correctly")
             return False
             
     except requests.exceptions.ConnectionError:
-        print("❌ Error: No se puede conectar a la API")
-        print("🔧 Solución: Ejecuta 'python -m uvicorn apps.api.main:app --reload --port 8000'")
+        print("❌ Error: Cannot connect to API")
+        print("🔧 Solution: Run 'python -m uvicorn apps.api.main:app --reload --port 8000'")
         return False
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        print(f"❌ Unexpected error: {e}")
         return False
 
 def test_system_health():
-    """Test del health check comprehensivo."""
-    print_step(2, "HEALTH CHECK COMPREHENSIVO")
+    """Comprehensive health check test."""
+    print_step(2, "COMPREHENSIVE HEALTH CHECK")
     
     try:
         response = requests.get('http://localhost:8000/monitoring/health')
         
         if response.status_code == 200:
             health = response.json()
-            print(f"📊 Estado General: {health['overall_status']}")
+            print(f"📊 Overall Status: {health['overall_status']}")
             
-            print("\n🔧 Componentes:")
+            print("\n🔧 Components:")
             for component, status in health['components'].items():
                 emoji = "✅" if status['status'] == 'healthy' else "⚠️"
                 print(f"  {emoji} {component}: {status['status']}")
             
-            # Contar componentes healthy
+            # Count healthy components
             healthy_count = sum(1 for comp in health['components'].values() 
                               if comp['status'] == 'healthy')
             total_count = len(health['components'])
-            print(f"\n📈 Score: {healthy_count}/{total_count} componentes healthy")
+            print(f"\n📈 Score: {healthy_count}/{total_count} healthy components")
             
             return health['overall_status'] in ['healthy', 'degraded']
         else:
-            print(f"❌ Error en health check: {response.status_code}")
+            print(f"❌ Health check error: {response.status_code}")
             return False
             
     except Exception as e:
-        print(f"❌ Error en health check: {e}")
+        print(f"❌ Health check error: {e}")
         return False
 
 def test_available_tools():
-    """Test de herramientas disponibles."""
-    print_step(3, "HERRAMIENTAS DISPONIBLES")
+    """Available tools test."""
+    print_step(3, "AVAILABLE TOOLS")
     
     try:
         response = requests.get('http://localhost:8000/tools/available')
         
         if response.status_code == 200:
             tools = response.json()
-            print(f"🛠️ Total herramientas: {tools['total_count']}")
-            print(f"📦 Básicas: {len(tools['basic_tools'])}")
-            print(f"⚡ Avanzadas: {len(tools['advanced_tools'])}")
-            print(f"📂 Categorías: {tools['categories']}")
+            print(f"🛠️ Total tools: {tools['total_count']}")
+            print(f"📦 Basic: {len(tools['basic_tools'])}")
+            print(f"⚡ Advanced: {len(tools['advanced_tools'])}")
+            print(f"📂 Categories: {tools['categories']}")
             
-            print("\n🔧 Herramientas Básicas:")
+            print("\n🔧 Basic Tools:")
             for tool in tools['basic_tools']:
                 print(f"  • {tool['name']}: {tool['description']}")
             
-            print("\n⚡ Herramientas Avanzadas:")
+            print("\n⚡ Advanced Tools:")
             for tool in tools['advanced_tools']:
                 print(f"  • {tool['name']}: {tool['description']}")
             
             return True
         else:
-            print(f"❌ Error obteniendo herramientas: {response.status_code}")
+            print(f"❌ Error getting tools: {response.status_code}")
             return False
             
     except Exception as e:
-        print(f"❌ Error en test de herramientas: {e}")
+        print(f"❌ Tools test error: {e}")
         return False
 
 def test_message_processing():
-    """Test de procesamiento de mensajes."""
-    print_step(4, "PROCESAMIENTO DE MENSAJES")
+    """Message processing test."""
+    print_step(4, "MESSAGE PROCESSING")
     
     test_messages = [
         {
             "text": "Hello! Can you help me schedule a visit to property ABC123 for tomorrow at 2 PM?",
-            "description": "Test básico de scheduling"
+            "description": "Basic scheduling test"
         },
         {
             "text": "What are your business hours?",
-            "description": "Test de información de negocio"
+            "description": "Business information test"
         },
         {
             "text": "Please send an email to john@example.com about our meeting",
-            "description": "Test de herramientas avanzadas"
+            "description": "Advanced tools test"
         }
     ]
     
@@ -127,7 +127,7 @@ def test_message_processing():
     
     for i, test_msg in enumerate(test_messages, 1):
         print(f"\n🧪 Test {i}: {test_msg['description']}")
-        print(f"📝 Mensaje: {test_msg['text']}")
+        print(f"📝 Message: {test_msg['text']}")
         
         try:
             response = requests.post('http://localhost:8000/message', json={
@@ -139,24 +139,24 @@ def test_message_processing():
             
             if response.status_code == 200:
                 result = response.json()
-                print(f"✅ Respuesta: {result['reply'][:80]}...")
-                print(f"🎯 Confianza: {result['confidence']}")
-                print(f"🛠️ Herramientas usadas: {result['tools_used']}")
+                print(f"✅ Response: {result['reply'][:80]}...")
+                print(f"🎯 Confidence: {result['confidence']}")
+                print(f"🛠️ Tools used: {result['tools_used']}")
                 
                 # Rate limiting info
                 rate_info = result['metadata'].get('rate_limit', {})
                 remaining = rate_info.get('remaining', 'N/A')
-                print(f"⚡ Rate limit restantes: {remaining}")
+                print(f"⚡ Rate limit remaining: {remaining}")
                 success_count += 1
                 
             elif response.status_code == 429:
-                print("⚡ Rate limited (sistema funcionando correctamente)")
-                success_count += 1  # Rate limiting también cuenta como éxito
+                print("⚡ Rate limited (system working correctly)")
+                success_count += 1  # Rate limiting also counts as success
             else:
                 print(f"❌ Error {response.status_code}: {response.text[:100]}")
                 
         except Exception as e:
-            print(f"❌ Error en test de mensaje: {e}")
+            print(f"❌ Message test error: {e}")
         
         # Pausa entre tests
         time.sleep(1)
@@ -164,8 +164,8 @@ def test_message_processing():
     return success_count == len(test_messages)
 
 def test_monitoring_features():
-    """Test de funcionalidades de monitoreo."""
-    print_step(5, "MONITOREO Y OBSERVABILIDAD")
+    """Monitoring features test."""
+    print_step(5, "MONITORING AND OBSERVABILITY")
     
     # Test error monitoring
     try:
@@ -174,19 +174,19 @@ def test_monitoring_features():
             errors = response.json()
             stats = errors.get('statistics', {})
             print(f"📊 Error tracking: {errors['status']}")
-            print(f"📈 Total errores: {stats.get('total_errors', 0)}")
-            print(f"⏰ Últimas 24h: {stats.get('last_24h', 0)}")
+            print(f"📈 Total errors: {stats.get('total_errors', 0)}")
+            print(f"⏰ Last 24h: {stats.get('last_24h', 0)}")
             return True
         else:
-            print(f"⚠️ Error monitoring no disponible: {response.status_code}")
+            print(f"⚠️ Error monitoring not available: {response.status_code}")
             return False
     except Exception as e:
-        print(f"⚠️ Error en monitoring: {e}")
+        print(f"⚠️ Monitoring error: {e}")
         return False
 
 def test_celery_status():
-    """Test del estado de Celery."""
-    print_step(6, "SISTEMA CELERY")
+    """Celery status test."""
+    print_step(6, "CELERY SYSTEM")
     
     success = True
     
@@ -194,38 +194,38 @@ def test_celery_status():
         response = requests.get('http://localhost:8000/celery/status')
         if response.status_code == 200:
             celery = response.json()
-            print(f"📊 Estado Celery: {celery['status']}")
-            print(f"🔗 Redis conectado: {celery['redis_connected']}")
+            print(f"📊 Celery Status: {celery['status']}")
+            print(f"🔗 Redis connected: {celery['redis_connected']}")
             
             if 'message' in celery:
                 print(f"💡 Info: {celery['message']}")
         else:
-            print(f"⚠️ Celery status no disponible: {response.status_code}")
+            print(f"⚠️ Celery status not available: {response.status_code}")
             success = False
             
         # Test direct execution
         response = requests.post('http://localhost:8000/celery/process-direct')
         if response.status_code == 200:
             result = response.json()
-            print(f"✅ Ejecución directa: {result['success']}")
+            print(f"✅ Direct execution: {result['success']}")
         else:
             success = False
         
         return success
         
     except Exception as e:
-        print(f"⚠️ Error en Celery test: {e}")
+        print(f"⚠️ Celery test error: {e}")
         return False
 
 def main():
-    """Ejecutar todos los tests."""
-    print_header("🚀 TEST COMPLETO DEL SISTEMA AI AGENT")
+    """Run all tests."""
+    print_header("🚀 COMPLETE AI AGENT SYSTEM TEST")
     print(f"⏰ Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     tests_passed = 0
     total_tests = 6
     
-    # Ejecutar tests
+    # Run tests
     if test_api_connectivity(): tests_passed += 1
     if test_system_health(): tests_passed += 1
     if test_available_tools(): tests_passed += 1
@@ -233,25 +233,25 @@ def main():
     if test_monitoring_features(): tests_passed += 1
     if test_celery_status(): tests_passed += 1
     
-    # Resumen final
-    print_header("📊 RESUMEN FINAL")
-    print(f"✅ Tests básicos pasados: {tests_passed}/{total_tests}")
+    # Final summary
+    print_header("📊 FINAL SUMMARY")
+    print(f"✅ Basic tests passed: {tests_passed}/{total_tests}")
     
     if tests_passed == total_tests:
-        print("🎉 SISTEMA COMPLETAMENTE FUNCIONAL!")
-        print("\n✨ Características habilitadas:")
-        print("• OpenAI Agent con respuestas inteligentes")
-        print("• Langfuse para observabilidad completa")
-        print("• Memoria conversacional con Redis")
-        print("• Rate limiting y guardrails de seguridad")
-        print("• Herramientas de negocio avanzadas")
-        print("• Monitoreo y error tracking")
+        print("🎉 SYSTEM FULLY FUNCTIONAL!")
+        print("\n✨ Enabled features:")
+        print("• OpenAI Agent with intelligent responses")
+        print("• Langfuse for complete observability")
+        print("• Conversational memory with Redis")
+        print("• Rate limiting and security guardrails")
+        print("• Advanced business tools")
+        print("• Monitoring and error tracking")
     elif tests_passed >= 3:
-        print("🎉 SISTEMA FUNCIONANDO CORRECTAMENTE!")
-        print(f"📊 {tests_passed}/{total_tests} componentes operativos")
+        print("🎉 SYSTEM WORKING CORRECTLY!")
+        print(f"📊 {tests_passed}/{total_tests} operational components")
     else:
-        print("⚠️ Algunos componentes necesitan atención")
-        print("📧 Revisa los logs para más detalles")
+        print("⚠️ Some components need attention")
+        print("📧 Check logs for more details")
 
 if __name__ == "__main__":
     main()

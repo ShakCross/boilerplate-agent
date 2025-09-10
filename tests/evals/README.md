@@ -1,135 +1,135 @@
 # 🧪 Tests & Evaluations
 
-Esta carpeta contiene scripts de testing y evaluación para el AI Agent.
+This folder contains testing and evaluation scripts for the AI Agent.
 
-## 📁 Archivos Organizados
+## 📁 Organized Files
 
-### 🔬 **Tests Principales**
+### 🔬 **Main Tests**
 
 #### `test_system_complete.py`
-**Test completo del sistema** - El test principal que verifica todos los componentes.
+**Complete system test** - The main test that verifies all components.
 
 ```bash
 cd tests/evals
 python test_system_complete.py
 ```
 
-**Qué prueba:**
-- ✅ Conectividad básica de la API
-- ✅ Health check comprehensivo (6/6 componentes)
-- ✅ Herramientas disponibles (8 herramientas)
-- ✅ Procesamiento de mensajes con IA
-- ✅ Monitoreo y observabilidad
-- ✅ Sistema Celery y workers
+**What it tests:**
+- ✅ Basic API connectivity
+- ✅ Comprehensive health check (6/6 components)
+- ✅ Available tools (8 tools)
+- ✅ AI message processing
+- ✅ Monitoring and observability
+- ✅ Celery system and workers
 
 ---
 
-### 🐰 **Tests de Celery & Workers**
+### 🐰 **Celery & Workers Tests**
 
 #### `check_workers.py`
-**Verificación de workers optimizados** - Verifica que los workers independientes funcionen.
+**Optimized workers verification** - Verifies that independent workers function.
 
 ```bash
 cd tests/evals
 python check_workers.py
 ```
 
-**Qué verifica:**
-- 🔍 Estado de workers de Celery
-- ⚡ Procesamiento asíncrono
-- 📊 Estadísticas de tasks
+**What it verifies:**
+- 🔍 Celery workers status
+- ⚡ Asynchronous processing
+- 📊 Task statistics
 
 #### `start_optimized_workers.py`
-**Optimización avanzada de workers** - Inicia workers con configuración optimizada.
+**Advanced worker optimization** - Starts workers with optimized configuration.
 
 ```bash
 cd tests/evals
 python start_optimized_workers.py
 ```
 
-**Características:**
-- 🚀 8 workers concurrentes
-- 🧵 Pool de threads (compatible Windows)
-- 📈 Configuración de alto rendimiento
+**Features:**
+- 🚀 8 concurrent workers
+- 🧵 Thread pool (Windows compatible)
+- 📈 High-performance configuration
 
 ---
 
-### 🔴 **Tests de Redis**
+### 🔴 **Redis Tests**
 
 #### `check_redis.py`
-**Verificación de Redis** - Muestra el contenido actual de Redis.
+**Redis verification** - Shows current Redis content.
 
 ```bash
 cd tests/evals
 python check_redis.py
 ```
 
-**Qué muestra:**
-- 📊 Keys totales en Redis
-- 💭 Conversaciones guardadas
-- ⚡ Rate limiting activo
-- 🔧 Tasks de Celery
+**What it shows:**
+- 📊 Total keys in Redis
+- 💭 Saved conversations
+- ⚡ Active rate limiting
+- 🔧 Celery tasks
 
 #### `redis_celery_demo.py`
-**Demo interactivo de Redis y Celery** - Demuestra cómo funcionan Redis y Celery.
+**Interactive Redis and Celery demo** - Demonstrates how Redis and Celery work.
 
 ```bash
 cd tests/evals
 python redis_celery_demo.py
 ```
 
-**Opciones del demo:**
-1. Contenido actual de Redis
-2. Demo de memoria conversacional
-3. Demo de rate limiting
-4. Demo de Celery tasks
-5. Todo lo anterior
+**Demo options:**
+1. Current Redis content
+2. Conversational memory demo
+3. Rate limiting demo
+4. Celery tasks demo
+5. All of the above
 
 ---
 
-### 🎮 **Test Manual Interactivo**
+### 🎮 **Interactive Manual Test**
 
 #### `test_manual.py`
-**Tester manual interactivo** - Interface para probar manualmente el sistema.
+**Interactive manual tester** - Interface to manually test the system.
 
 ```bash
 cd tests/evals
 python test_manual.py
 ```
 
-**Opciones disponibles:**
-1. Test de salud del sistema
-2. Ver herramientas disponibles
-3. Test rápido - Horarios de negocio
-4. Test rápido - Programar visita
-5. Test rápido - Enviar email
-6. **Modo interactivo (chat)**
-7. Test personalizado
+**Available options:**
+1. System health test
+2. View available tools
+3. Quick test - Business hours
+4. Quick test - Schedule visit
+5. Quick test - Send email
+6. **Interactive mode (chat)**
+7. Custom test
 
 ---
 
-## 🚀 **Guía de Uso Rápido**
+## 🚀 **Quick Usage Guide**
 
-### **Test Completo del Sistema:**
+### **Complete System Test:**
 ```bash
 cd tests/evals
 python test_system_complete.py
 ```
 
-### **Verificar Workers Optimizados:**
+### **Verify Optimized Workers:**
 ```bash
 cd tests/evals
 python check_workers.py
 ```
 
-### **Chat Interactivo:**
+### **Interactive Chat:**
 ```bash
 cd tests/evals
 python test_manual.py
-# Elige opción 6 para modo chat
+# Choose option 6 for chat mode
 ```
 
-### **Ver Estado de Redis:**
+### **View Redis Status:**
 ```bash
 cd tests/evals
 python check_redis.py
@@ -137,59 +137,59 @@ python check_redis.py
 
 ---
 
-## 📊 **Resultados Esperados**
+## 📊 **Expected Results**
 
-### **Sistema Completamente Funcional:**
+### **Fully Functional System:**
 ```
-✅ Tests básicos pasados: 6/6
-🎉 SISTEMA COMPLETAMENTE FUNCIONAL!
+✅ Basic tests passed: 6/6
+🎉 SYSTEM FULLY FUNCTIONAL!
 
-✨ Características habilitadas:
-• OpenAI Agent con respuestas inteligentes
-• Langfuse para observabilidad completa
-• Memoria conversacional con Redis
-• Rate limiting y guardrails de seguridad
-• Herramientas de negocio avanzadas
-• Monitoreo y error tracking
+✨ Enabled features:
+• OpenAI Agent with intelligent responses
+• Langfuse for complete observability
+• Conversational memory with Redis
+• Rate limiting and security guardrails
+• Advanced business tools
+• Monitoring and error tracking
 ```
 
-### **Workers Optimizados:**
+### **Optimized Workers:**
 ```
-=== RESUMEN ===
-Workers funcionando: SI
-Procesamiento async: SI
+=== SUMMARY ===
+Workers functioning: YES
+Async processing: YES
 
-EXITO: Sistema optimizado con workers independientes!
+SUCCESS: Optimized system with independent workers!
 ```
 
 ---
 
 ## 🛠️ **Troubleshooting**
 
-### **Si el test falla:**
-1. Verificar que la API esté corriendo: `python -m uvicorn apps.api.main:app --reload --port 8000`
-2. Verificar que Redis esté corriendo: `docker-compose up redis -d`
-3. Verificar workers: `python check_workers.py`
+### **If the test fails:**
+1. Verify the API is running: `python -m uvicorn apps.api.main:app --reload --port 8000`
+2. Verify Redis is running: `docker-compose up redis -d`
+3. Verify workers: `python check_workers.py`
 
-### **Si Redis está vacío:**
-- Es normal al inicio, se llenará con el uso
-- Ejecutar algunos tests para generar datos
+### **If Redis is empty:**
+- Normal at startup, will fill with usage
+- Run some tests to generate data
 
-### **Si Celery no funciona:**
-- Usar el script optimizado: `python start_optimized_workers.py`
-- En Windows, usar pool de threads: `--pool=threads`
-
----
-
-## 📈 **Métricas de Performance**
-
-Los tests miden:
-- 📊 **Response time** de la API
-- 🎯 **Confidence score** del agente (0.95 típico)
-- ⚡ **Rate limiting** (60 requests/minuto)
-- 🔄 **Workers online** (1+ workers activos)
-- 💭 **Conversaciones** guardadas en Redis
+### **If Celery doesn't work:**
+- Use the optimized script: `python start_optimized_workers.py`
+- On Windows, use thread pool: `--pool=threads`
 
 ---
 
-**¡Todos los tests están optimizados y listos para usar!** 🎉
+## 📈 **Performance Metrics**
+
+The tests measure:
+- 📊 API **Response time**
+- 🎯 Agent **Confidence score** (typical 0.95)
+- ⚡ **Rate limiting** (60 requests/minute)
+- 🔄 **Workers online** (1+ active workers)
+- 💭 **Conversations** saved in Redis
+
+---
+
+**All tests are optimized and ready to use!** 🎉

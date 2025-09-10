@@ -154,17 +154,26 @@ class ConversationMemory:
         if not user_messages:
             return ""
         
-        # Create a simple context summary
+        # Create a simple context summary with recent conversation flow
         context_parts = []
         
-        if len(user_messages) > 1:
-            context_parts.append(f"User has asked about: {', '.join(user_messages[-3:])}")
-        
-        if assistant_messages:
-            last_response = assistant_messages[-1]
-            if len(last_response) > 100:
-                last_response = last_response[:100] + "..."
-            context_parts.append(f"Last discussed: {last_response}")
+        # Include recent conversation turns for better context
+        if len(history) >= 2:
+            recent_turns = []
+            for msg in history[-4:]:  # Last 4 messages (2 turns)
+                role = "User" if msg["role"] == "user" else "Assistant"
+                content = msg["content"]
+                if len(content) > 80:
+                    content = content[:80] + "..."
+                recent_turns.append(f"{role}: {content}")
+            
+            context_parts.append("Recent conversation: " + " | ".join(recent_turns))
+        elif user_messages:
+            # Fallback to simple format if limited history
+            last_user_msg = user_messages[-1]
+            if len(last_user_msg) > 100:
+                last_user_msg = last_user_msg[:100] + "..."
+            context_parts.append(f"User's last question: '{last_user_msg}'")
         
         return " | ".join(context_parts)
     

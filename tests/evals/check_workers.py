@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script para verificar el estado de los workers de Celery
+Script to check the status of Celery workers
 """
 
 import requests
@@ -8,18 +8,18 @@ import time
 import json
 
 def check_workers():
-    print('Verificando estado de workers...')
+    print('Checking worker status...')
     
     try:
-        # Dar tiempo a que los workers inicien
+        # Give time for workers to start
         time.sleep(2)
         
         response = requests.get('http://localhost:8000/celery/status')
         
         if response.status_code == 200:
             status = response.json()
-            print(f'Estado: {status.get("status", "unknown")}')
-            print(f'Redis conectado: {status.get("redis_connected", False)}')
+            print(f'Status: {status.get("status", "unknown")}')
+            print(f'Redis connected: {status.get("redis_connected", False)}')
             
             if 'workers_online' in status:
                 print(f'Workers online: {status["workers_online"]}')
@@ -42,7 +42,7 @@ def check_workers():
         return False
 
 def test_async_processing():
-    print('\nTestando procesamiento asincrono...')
+    print('\nTesting asynchronous processing...')
     
     try:
         response = requests.post('http://localhost:8000/message/async', json={
@@ -55,22 +55,22 @@ def test_async_processing():
         if response.status_code == 200:
             result = response.json()
             task_id = result.get('task_id')
-            print(f'Task enviada: {task_id}')
+            print(f'Task sent: {task_id}')
             
-            # Esperar y verificar resultado
+            # Wait and check result
             time.sleep(3)
             
             status_response = requests.get(f'http://localhost:8000/celery/task/{task_id}')
             if status_response.status_code == 200:
                 task_status = status_response.json()
-                print(f'Estado de task: {json.dumps(task_status, indent=2)}')
+                print(f'Task status: {json.dumps(task_status, indent=2)}')
                 return True
             else:
-                print(f'Error verificando task: {status_response.status_code}')
+                print(f'Error checking task: {status_response.status_code}')
                 return False
                 
         else:
-            print(f'Error enviando task: {response.status_code}')
+            print(f'Error sending task: {response.status_code}')
             print(f'Response: {response.text}')
             return False
             
@@ -79,16 +79,16 @@ def test_async_processing():
         return False
 
 if __name__ == "__main__":
-    print('=== VERIFICACION DE WORKERS OPTIMIZADOS ===')
+    print('=== OPTIMIZED WORKERS VERIFICATION ===')
     
     workers_ok = check_workers()
     async_ok = test_async_processing()
     
-    print('\n=== RESUMEN ===')
-    print(f'Workers funcionando: {"SI" if workers_ok else "NO"}')
-    print(f'Procesamiento async: {"SI" if async_ok else "NO"}')
+    print('\n=== SUMMARY ===')
+    print(f'Workers functioning: {"YES" if workers_ok else "NO"}')
+    print(f'Async processing: {"YES" if async_ok else "NO"}')
     
     if workers_ok and async_ok:
-        print('\nEXITO: Sistema optimizado con workers independientes!')
+        print('\nSUCCESS: Optimized system with independent workers!')
     else:
-        print('\nPENDIENTE: Aun necesita optimizacion')
+        print('\nPENDING: Still needs optimization')

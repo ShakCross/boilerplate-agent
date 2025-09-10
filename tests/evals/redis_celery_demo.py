@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
-Demo de cómo funcionan Redis y Celery en el AI Agent
+Demo of how Redis and Celery work in the AI Agent
 """
-
+import sys
+import os
 import redis
+
+# Add project root to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 import requests
 import json
 import time
@@ -17,22 +21,22 @@ def print_section(title):
 
 
 def show_redis_usage():
-    """Mostrar cómo se usa Redis en el sistema"""
-    print_section("🔴 REDIS - USOS EN EL SISTEMA")
+    """Show how Redis is used in the system"""
+    print_section("🔴 REDIS - SYSTEM USAGE")
     
     try:
         redis_client = redis.from_url(settings.get_redis_url_for_memory(), decode_responses=True)
         
-        # 1. MEMORIA CONVERSACIONAL
-        print("\n1️⃣ MEMORIA CONVERSACIONAL:")
+        # 1. CONVERSATIONAL MEMORY
+        print("\n1️⃣ CONVERSATIONAL MEMORY:")
         conv_keys = [k for k in redis_client.keys('*') if k.startswith('conversation:')]
-        print(f"   • Conversaciones guardadas: {len(conv_keys)}")
+        print(f"   • Saved conversations: {len(conv_keys)}")
         
         if conv_keys:
             sample_key = conv_keys[0]
             messages = redis_client.llen(sample_key)
-            print(f"   • Ejemplo: {sample_key}")
-            print(f"   • Mensajes en esta conversación: {messages}")
+            print(f"   • Example: {sample_key}")
+            print(f"   • Messages in this conversation: {messages}")
             
             # Mostrar un mensaje de ejemplo
             if messages > 0:
@@ -40,27 +44,27 @@ def show_redis_usage():
                 if sample_msg:
                     try:
                         msg_data = json.loads(sample_msg)
-                        print(f"   • Último mensaje: {msg_data.get('message', 'N/A')[:50]}...")
+                        print(f"   • Last message: {msg_data.get('message', 'N/A')[:50]}...")
                     except:
-                        print(f"   • Último mensaje: {sample_msg[:50]}...")
+                        print(f"   • Last message: {sample_msg[:50]}...")
         
         # 2. RATE LIMITING
         print("\n2️⃣ RATE LIMITING:")
         rate_keys = [k for k in redis_client.keys('*') if k.startswith('rate_limit:')]
-        print(f"   • Contadores de rate limit activos: {len(rate_keys)}")
+        print(f"   • Active rate limit counters: {len(rate_keys)}")
         
         if rate_keys:
             sample_rate = rate_keys[0]
             count = redis_client.get(sample_rate)
             ttl = redis_client.ttl(sample_rate)
-            print(f"   • Ejemplo: {sample_rate}")
-            print(f"   • Requests usados: {count}")
-            print(f"   • Expira en: {ttl} segundos")
+            print(f"   • Example: {sample_rate}")
+            print(f"   • Requests used: {count}")
+            print(f"   • Expires in: {ttl} seconds")
         
         # 3. CELERY TASKS
         print("\n3️⃣ CELERY TASKS:")
         celery_keys = [k for k in redis_client.keys('*') if 'celery' in k.lower() or k in ['agent_tasks', 'unacked']]
-        print(f"   • Keys relacionadas con Celery: {len(celery_keys)}")
+        print(f"   • Keys related to Celery: {len(celery_keys)}")
         
         for key in celery_keys[:3]:
             key_type = redis_client.type(key)
@@ -74,16 +78,16 @@ def show_redis_usage():
                 print(f"   • {key} ({key_type})")
                 
     except Exception as e:
-        print(f"❌ Error conectando a Redis: {e}")
+        print(f"❌ Error connecting to Redis: {e}")
 
 
 def demo_conversation_memory():
-    """Demostrar cómo funciona la memoria conversacional"""
-    print_section("💭 DEMO: MEMORIA CONVERSACIONAL")
+    """Demonstrate how conversational memory works"""
+    print_section("💭 DEMO: CONVERSATIONAL MEMORY")
     
     session_id = f"demo_memory_{int(time.time())}"
     
-    print(f"📝 Iniciando conversación con session_id: {session_id}")
+    print(f"📝 Starting conversation with session_id: {session_id}")
     
     # Mensaje 1
     print("\n🗣️ Usuario: 'Hi, what's your name?'")
@@ -96,14 +100,14 @@ def demo_conversation_memory():
     
     if response1.status_code == 200:
         data1 = response1.json()
-        print(f"🤖 Agente: {data1['reply'][:100]}...")
+        print(f"🤖 Agent: {data1['reply'][:100]}...")
     
     time.sleep(1)
     
     # Mensaje 2 (debería recordar el contexto)
-    print("\n🗣️ Usuario: 'What did I just ask you?'")
+    print("\n🗣️ Usuario: 'What was my last question?'")
     response2 = requests.post('http://localhost:8000/message', json={
-        'text': "What did I just ask you?",
+        'text': "What was my last question?",
         'session_id': session_id,  # Misma sesión
         'tenant_id': 'demo_tenant',
         'locale': 'en'
@@ -111,30 +115,30 @@ def demo_conversation_memory():
     
     if response2.status_code == 200:
         data2 = response2.json()
-        print(f"🤖 Agente: {data2['reply'][:100]}...")
-        print("\n✅ El agente debería recordar la pregunta anterior!")
+        print(f"🤖 Agent: {data2['reply'][:100]}...")
+        print("\n✅ The agent should remember the previous question!")
     
     # Verificar en Redis
     try:
         redis_client = redis.from_url(settings.get_redis_url_for_memory(), decode_responses=True)
         conv_key = f"conversation:demo_tenant:{session_id}"
         messages = redis_client.llen(conv_key)
-        print(f"\n📊 Mensajes guardados en Redis: {messages}")
+        print(f"\n📊 Messages saved in Redis: {messages}")
     except Exception as e:
-        print(f"❌ Error verificando Redis: {e}")
+        print(f"❌ Error checking Redis: {e}")
 
 
 def demo_rate_limiting():
-    """Demostrar rate limiting"""
+    """Demonstrate rate limiting"""
     print_section("⚡ DEMO: RATE LIMITING")
     
     session_id = f"rate_test_{int(time.time())}"
     
-    print("📝 Enviando múltiples mensajes rápidamente...")
-    print("   (Rate limit: 60 requests por minuto por sesión)")
+    print("📝 Sending multiple messages quickly...")
+    print("   (Rate limit: 60 requests per minute per session)")
     
     for i in range(5):
-        print(f"\n🔄 Mensaje {i+1}/5")
+        print(f"\n🔄 Message {i+1}/5")
         response = requests.post('http://localhost:8000/message', json={
             'text': f"Test message {i+1}",
             'session_id': session_id,
@@ -146,7 +150,7 @@ def demo_rate_limiting():
             data = response.json()
             rate_info = data['metadata'].get('rate_limit', {})
             remaining = rate_info.get('remaining', 'N/A')
-            print(f"   ✅ Éxito - Restantes: {remaining}")
+            print(f"   ✅ Success - Remaining: {remaining}")
         elif response.status_code == 429:
             print(f"   ⚡ Rate limited!")
             break
@@ -157,22 +161,22 @@ def demo_rate_limiting():
 
 
 def demo_celery_tasks():
-    """Demostrar tasks de Celery"""
+    """Demonstrate Celery tasks"""
     print_section("🔧 DEMO: CELERY TASKS")
     
-    print("📝 Probando Celery tasks...")
+    print("📝 Testing Celery tasks...")
     
-    # 1. Test directo de task
-    print("\n1️⃣ Ejecución directa de task:")
+    # 1. Direct task test
+    print("\n1️⃣ Direct task execution:")
     response = requests.post('http://localhost:8000/celery/process-direct')
     if response.status_code == 200:
         result = response.json()
-        print(f"   ✅ Task ejecutada: {result}")
+        print(f"   ✅ Task executed: {result}")
     else:
         print(f"   ❌ Error: {response.status_code}")
     
-    # 2. Enviar mensaje asíncrono
-    print("\n2️⃣ Procesamiento asíncrono de mensaje:")
+    # 2. Send async message
+    print("\n2️⃣ Asynchronous message processing:")
     response = requests.post('http://localhost:8000/message/async', json={
         'text': "Process this asynchronously",
         'session_id': f"async_test_{int(time.time())}",
@@ -183,25 +187,25 @@ def demo_celery_tasks():
     if response.status_code == 202:
         result = response.json()
         task_id = result.get('task_id')
-        print(f"   ✅ Task enviada: {task_id}")
+        print(f"   ✅ Task sent: {task_id}")
         
-        # Verificar estado
+        # Check status
         if task_id:
             time.sleep(2)
             status_response = requests.get(f'http://localhost:8000/celery/task/{task_id}')
             if status_response.status_code == 200:
                 status = status_response.json()
-                print(f"   📊 Estado: {status}")
+                print(f"   📊 Status: {status}")
     else:
         print(f"   ❌ Error: {response.status_code}")
     
-    # 3. Estado de workers
-    print("\n3️⃣ Estado de Celery workers:")
+    # 3. Worker status
+    print("\n3️⃣ Celery worker status:")
     response = requests.get('http://localhost:8000/celery/status')
     if response.status_code == 200:
         status = response.json()
-        print(f"   📊 Estado: {status['status']}")
-        print(f"   🔗 Redis conectado: {status['redis_connected']}")
+        print(f"   📊 Status: {status['status']}")
+        print(f"   🔗 Redis connected: {status['redis_connected']}")
         if 'message' in status:
             print(f"   💡 Info: {status['message']}")
     else:
@@ -209,21 +213,21 @@ def demo_celery_tasks():
 
 
 def main():
-    print("🚀 DEMO: REDIS Y CELERY EN AI AGENT")
+    print("🚀 DEMO: REDIS AND CELERY IN AI AGENT")
     
-    print("\n📋 ¿Qué quieres ver?")
-    print("1. Contenido actual de Redis")
-    print("2. Demo de memoria conversacional")
-    print("3. Demo de rate limiting")
-    print("4. Demo de Celery tasks")
-    print("5. Todo lo anterior")
-    print("0. Salir")
+    print("\n📋 What do you want to see?")
+    print("1. Current Redis content")
+    print("2. Conversational memory demo")
+    print("3. Rate limiting demo")
+    print("4. Celery tasks demo")
+    print("5. All of the above")
+    print("0. Exit")
     
     try:
-        opcion = input("\n🎯 Elige una opción (0-5): ").strip()
+        opcion = input("\n🎯 Choose an option (0-5): ").strip()
         
         if opcion == "0":
-            print("👋 ¡Hasta luego!")
+            print("👋 Goodbye!")
             return
         elif opcion == "1":
             show_redis_usage()
@@ -239,10 +243,10 @@ def main():
             demo_rate_limiting()
             demo_celery_tasks()
         else:
-            print("❌ Opción inválida")
+            print("❌ Invalid option")
             
     except KeyboardInterrupt:
-        print("\n👋 ¡Hasta luego!")
+        print("\n👋 Goodbye!")
     except Exception as e:
         print(f"❌ Error: {e}")
 

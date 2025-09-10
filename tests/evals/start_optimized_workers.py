@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script para iniciar workers optimizados de Celery
+Script to start optimized Celery workers
 """
 
 import subprocess
@@ -11,14 +11,14 @@ import psutil
 import os
 
 def kill_existing_workers():
-    """Terminar workers de Celery existentes"""
-    print("🔄 Terminando workers existentes...")
+    """Terminate existing Celery workers"""
+    print("🔄 Terminating existing workers...")
     
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
         try:
             cmdline = ' '.join(proc.info['cmdline'] or [])
             if 'celery' in cmdline and 'worker' in cmdline and 'agents_core' not in cmdline:
-                print(f"   Terminando proceso: {proc.info['pid']}")
+                print(f"   Terminating process: {proc.info['pid']}")
                 proc.terminate()
                 proc.wait(timeout=5)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.TimeoutExpired):
@@ -27,24 +27,24 @@ def kill_existing_workers():
     time.sleep(2)
 
 def start_optimized_workers():
-    """Iniciar workers optimizados"""
-    print("🚀 Iniciando workers optimizados...")
+    """Start optimized workers"""
+    print("🚀 Starting optimized workers...")
     
-    # Configuración optimizada para Windows
+    # Optimized configuration for Windows
     cmd = [
         sys.executable, '-m', 'celery',
         '-A', 'workers.celery_worker.app',
         'worker',
         '--loglevel=info',
         '--pool=threads',
-        '--concurrency=8',  # Más workers
-        '--prefetch-multiplier=1',  # Mejor distribución
-        '--without-gossip',  # Menos overhead
-        '--without-mingle',  # Inicio más rápido
-        '--without-heartbeat'  # Menos overhead
+        '--concurrency=8',  # More workers
+        '--prefetch-multiplier=1',  # Better distribution
+        '--without-gossip',  # Less overhead
+        '--without-mingle',  # Faster startup
+        '--without-heartbeat'  # Less overhead
     ]
     
-    print(f"   Comando: {' '.join(cmd)}")
+    print(f"   Command: {' '.join(cmd)}")
     
     try:
         # Iniciar proceso en background
@@ -57,11 +57,11 @@ def start_optimized_workers():
         )
         
         print(f"   PID: {process.pid}")
-        print("   Esperando inicialización...")
+        print("   Waiting for initialization...")
         
-        # Mostrar output inicial
+        # Show initial output
         start_time = time.time()
-        while time.time() - start_time < 10:  # 10 segundos máximo
+        while time.time() - start_time < 10:  # 10 seconds maximum
             line = process.stdout.readline()
             if line:
                 print(f"   {line.strip()}")
@@ -75,13 +75,13 @@ def start_optimized_workers():
         return None
 
 def verify_workers():
-    """Verificar que los workers están funcionando"""
-    print("🔍 Verificando workers...")
+    """Verify that workers are functioning"""
+    print("🔍 Verifying workers...")
     
     import requests
     
     try:
-        time.sleep(3)  # Dar tiempo a inicializar
+        time.sleep(3)  # Give time to initialize
         
         response = requests.get('http://localhost:8000/celery/status', timeout=10)
         
@@ -91,13 +91,13 @@ def verify_workers():
             redis_connected = status.get('redis_connected', False)
             
             print(f"   Workers online: {workers_online}")
-            print(f"   Redis conectado: {redis_connected}")
+            print(f"   Redis connected: {redis_connected}")
             
             if workers_online > 0 and redis_connected:
-                print("   ✅ Workers funcionando correctamente!")
+                print("   ✅ Workers functioning correctly!")
                 return True
             else:
-                print("   ⚠️ Workers no detectados")
+                print("   ⚠️ Workers not detected")
                 return False
         else:
             print(f"   ❌ Error HTTP: {response.status_code}")
@@ -108,8 +108,8 @@ def verify_workers():
         return False
 
 def test_async_task():
-    """Probar task asíncrona"""
-    print("🧪 Probando task asíncrona...")
+    """Test async task"""
+    print("🧪 Testing async task...")
     
     import requests
     
@@ -125,9 +125,9 @@ def test_async_task():
         if response.status_code == 200:
             result = response.json()
             task_id = result.get('task_id')
-            print(f"   Task enviada: {task_id}")
+            print(f"   Task sent: {task_id}")
             
-            # Verificar resultado
+            # Check result
             time.sleep(5)
             status_response = requests.get(f'http://localhost:8000/celery/task/{task_id}', timeout=10)
             
@@ -136,20 +136,20 @@ def test_async_task():
                 status = task_status.get('status', 'UNKNOWN')
                 ready = task_status.get('ready', False)
                 
-                print(f"   Estado: {status}")
-                print(f"   Completada: {ready}")
+                print(f"   Status: {status}")
+                print(f"   Completed: {ready}")
                 
                 if ready and status == 'SUCCESS':
-                    print("   ✅ Task procesada exitosamente!")
+                    print("   ✅ Task processed successfully!")
                     return True
                 else:
-                    print("   ⚠️ Task aún procesando o falló")
+                    print("   ⚠️ Task still processing or failed")
                     return False
             else:
-                print(f"   ❌ Error verificando task: {status_response.status_code}")
+                print(f"   ❌ Error checking task: {status_response.status_code}")
                 return False
         else:
-            print(f"   ❌ Error enviando task: {response.status_code}")
+            print(f"   ❌ Error sending task: {response.status_code}")
             return False
             
     except Exception as e:
@@ -158,58 +158,58 @@ def test_async_task():
 
 def main():
     print("=" * 60)
-    print("  🚀 OPTIMIZACIÓN DE WORKERS INDEPENDIENTES")
+    print("  🚀 INDEPENDENT WORKERS OPTIMIZATION")
     print("=" * 60)
     
     try:
-        # 1. Terminar workers existentes
+        # 1. Terminate existing workers
         kill_existing_workers()
         
-        # 2. Iniciar workers optimizados
+        # 2. Start optimized workers
         process = start_optimized_workers()
         if not process:
-            print("❌ No se pudieron iniciar los workers")
+            print("❌ Could not start workers")
             return
         
-        # 3. Verificar workers
+        # 3. Verify workers
         workers_ok = verify_workers()
         
-        # 4. Probar task asíncrona
+        # 4. Test async task
         async_ok = test_async_task()
         
-        # 5. Resumen
+        # 5. Summary
         print("\n" + "=" * 60)
-        print("  📊 RESUMEN DE OPTIMIZACIÓN")
+        print("  📊 OPTIMIZATION SUMMARY")
         print("=" * 60)
-        print(f"Workers optimizados: {'✅ SÍ' if workers_ok else '❌ NO'}")
-        print(f"Procesamiento async: {'✅ SÍ' if async_ok else '❌ NO'}")
+        print(f"Optimized workers: {'✅ YES' if workers_ok else '❌ NO'}")
+        print(f"Async processing: {'✅ YES' if async_ok else '❌ NO'}")
         
         if workers_ok and async_ok:
-            print("\n🎉 ¡OPTIMIZACIÓN EXITOSA!")
-            print("   • Workers independientes funcionando")
-            print("   • Procesamiento asíncrono activo")
-            print("   • Máximo rendimiento alcanzado")
+            print("\n🎉 OPTIMIZATION SUCCESSFUL!")
+            print("   • Independent workers functioning")
+            print("   • Asynchronous processing active")
+            print("   • Maximum performance achieved")
             
-            print(f"\n💡 Workers ejecutándose en PID: {process.pid}")
-            print("   Para detenerlos: Ctrl+C o kill el proceso")
+            print(f"\n💡 Workers running on PID: {process.pid}")
+            print("   To stop them: Ctrl+C or kill the process")
             
-            # Mantener workers corriendo
+            # Keep workers running
             try:
-                print("\n⏳ Manteniendo workers activos... (Ctrl+C para detener)")
+                print("\n⏳ Keeping workers active... (Ctrl+C to stop)")
                 process.wait()
             except KeyboardInterrupt:
-                print("\n🛑 Deteniendo workers...")
+                print("\n🛑 Stopping workers...")
                 process.terminate()
                 
         else:
-            print("\n⚠️ OPTIMIZACIÓN PARCIAL")
-            print("   • Algunos componentes necesitan ajustes")
+            print("\n⚠️ PARTIAL OPTIMIZATION")
+            print("   • Some components need adjustments")
             process.terminate()
             
     except KeyboardInterrupt:
-        print("\n🛑 Proceso interrumpido por usuario")
+        print("\n🛑 Process interrupted by user")
     except Exception as e:
-        print(f"\n❌ Error inesperado: {e}")
+        print(f"\n❌ Unexpected error: {e}")
 
 if __name__ == "__main__":
     main()

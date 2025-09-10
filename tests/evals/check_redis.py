@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+import sys
+import os
 import redis
+
+# Add project root to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from agents_core.config.settings import settings
 
 print('=== CONTENIDO ACTUAL DE REDIS ===')

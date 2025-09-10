@@ -1,31 +1,31 @@
-# 🔍 Plan de Implementación RAG para AI Agent
+# 🔍 RAG Implementation Plan for AI Agent
 
-## 📊 Estado Actual
-- ❌ **NO tiene RAG implementado**
-- ✅ **Estructura preparada** para RAG (tool `search_documents` existe)
-- ✅ **Sistema modular** permite agregar RAG fácilmente
+## 📊 Current Status
+- ❌ **NO RAG implemented**
+- ✅ **Structure prepared** for RAG (`search_documents` tool exists)
+- ✅ **Modular system** allows easy RAG addition
 
-## 🎯 Implementación Sugerida
+## 🎯 Suggested Implementation
 
-### **OPCIÓN 1: RAG Simple con ChromaDB** (Recomendado para empezar)
+### **OPTION 1: Simple RAG with ChromaDB** (Recommended to start)
 
-#### 1. Dependencias necesarias:
+#### 1. Required dependencies:
 ```bash
 pip install chromadb sentence-transformers pypdf2 langchain-text-splitters
 ```
 
-#### 2. Estructura RAG propuesta:
+#### 2. Proposed RAG structure:
 ```
 agents_core/
 ├── rag/
 │   ├── __init__.py
 │   ├── vector_store.py      # ChromaDB setup
-│   ├── document_loader.py   # Cargar PDFs, txt, etc
+│   ├── document_loader.py   # Load PDFs, txt, etc
 │   ├── embeddings.py        # Sentence transformers
-│   └── retriever.py         # Lógica de búsqueda
+│   └── retriever.py         # Search logic
 ```
 
-#### 3. Archivos a crear:
+#### 3. Files to create:
 
 **agents_core/rag/vector_store.py:**
 ```python
@@ -87,9 +87,9 @@ class DocumentLoader:
         return self.text_splitter.split_text(text)
 ```
 
-#### 4. Modificar search_documents para usar RAG:
+#### 4. Modify search_documents to use RAG:
 
-**agents_core/tools/advanced_tools.py** (reemplazar función mock):
+**agents_core/tools/advanced_tools.py** (replace mock function):
 ```python
 async def search_documents(input_data: DocumentSearchInput) -> DocumentSearchOutput:
     """Search through company documents and knowledge base using RAG."""
@@ -132,42 +132,42 @@ async def search_documents(input_data: DocumentSearchInput) -> DocumentSearchOut
         return await search_documents_mock(input_data)
 ```
 
-### **OPCIÓN 2: RAG Avanzado con Langchain + Pinecone**
+### **OPTION 2: Advanced RAG with Langchain + Pinecone**
 
-#### Dependencias:
+#### Dependencies:
 ```bash
 pip install langchain pinecone-client openai langchain-openai
 ```
 
-#### Características:
-- ✅ Vector store en la nube (Pinecone)
-- ✅ Embeddings de OpenAI
-- ✅ Mejor performance para grandes volúmenes
-- ✅ Búsqueda híbrida (semántica + keyword)
+#### Features:
+- ✅ Cloud vector store (Pinecone)
+- ✅ OpenAI embeddings
+- ✅ Better performance for large volumes
+- ✅ Hybrid search (semantic + keyword)
 
-### **OPCIÓN 3: RAG con Weaviate** (Para producción)
+### **OPTION 3: RAG with Weaviate** (For production)
 
-#### Características:
+#### Features:
 - ✅ GraphQL API
-- ✅ Búsqueda híbrida nativa
-- ✅ Filtros complejos
-- ✅ Escalabilidad enterprise
+- ✅ Native hybrid search
+- ✅ Complex filters
+- ✅ Enterprise scalability
 
-## 🛠️ Implementación Paso a Paso
+## 🛠️ Step-by-Step Implementation
 
-### **Paso 1: Setup básico con ChromaDB**
+### **Step 1: Basic setup with ChromaDB**
 ```bash
-# Instalar dependencias
+# Install dependencies
 pip install chromadb sentence-transformers pypdf2
 
-# Crear estructura de carpetas
+# Create folder structure
 mkdir -p agents_core/rag
 mkdir -p rag_data/documents
 ```
 
-### **Paso 2: Cargar documentos iniciales**
+### **Step 2: Load initial documents**
 ```python
-# Script para cargar documentos
+# Script to load documents
 from agents_core.rag.vector_store import VectorStore
 from agents_core.rag.document_loader import DocumentLoader
 
@@ -175,7 +175,7 @@ def setup_rag():
     loader = DocumentLoader()
     vector_store = VectorStore()
     
-    # Cargar documentos de ejemplo
+    # Load example documents
     documents_path = Path("rag_data/documents")
     for file_path in documents_path.glob("*.pdf"):
         text = loader.load_pdf(file_path)
@@ -191,44 +191,45 @@ def setup_rag():
         vector_store.add_documents(chunks, metadatas, ids)
 ```
 
-### **Paso 3: Endpoint para cargar documentos**
+### **Step 3: Endpoint to upload documents**
 ```python
-# En apps/api/main.py
+# In apps/api/main.py
 @app.post("/rag/upload")
 async def upload_document(file: UploadFile):
-    # Guardar archivo
-    # Procesar con RAG
-    # Retornar status
+    # Save file
+    # Process with RAG
+    # Return status
 ```
 
-## 📊 Beneficios del RAG
+## 📊 RAG Benefits
 
-### **✅ Con RAG tendrías:**
-1. **🧠 Conocimiento específico**: El agente conoce tus documentos
-2. **📚 Base de conocimiento**: FAQs, manuales, políticas
-3. **🔍 Búsqueda semántica**: Encuentra info por contexto, no solo keywords
-4. **📈 Respuestas mejoradas**: Citas fuentes reales
-5. **🔄 Actualizable**: Agregar documentos dinámicamente
+### **✅ With RAG you would have:**
+1. **🧠 Specific knowledge**: The agent knows your documents
+2. **📚 Knowledge base**: FAQs, manuals, policies
+3. **🔍 Semantic search**: Finds info by context, not just keywords
+4. **📈 Improved responses**: Cites real sources
+5. **🔄 Updatable**: Add documents dynamically
 
-### **🎯 Casos de uso:**
-- 📋 Manual de empleados
-- ❓ FAQs de productos
-- 📖 Documentación técnica
-- 🏢 Políticas de empresa
-- 📊 Reportes y análisis
+### **🎯 Use cases:**
+- 📋 Employee handbook
+- ❓ Product FAQs
+- 📖 Technical documentation
+- 🏢 Company policies
+- 📊 Reports and analysis
 
-## 🚀 Recomendación
+## 🚀 Recommendation
 
-**Para empezar:** Implementa ChromaDB (Opción 1)
-- ✅ Fácil setup
-- ✅ No requiere servicios externos
-- ✅ Perfecto para prototipos
-- ✅ Migración fácil a opciones avanzadas
+**To start:** Implement ChromaDB (Option 1)
+- ✅ Easy setup
+- ✅ No external services required
+- ✅ Perfect for prototypes
+- ✅ Easy migration to advanced options
 
-**Para producción:** Considera Pinecone o Weaviate
-- 🚀 Mejor performance
-- 📈 Escalabilidad
-- 🛡️ Respaldos automáticos
-- 🔧 Funciones avanzadas
+**For production:** Consider Pinecone or Weaviate
+- 🚀 Better performance
+- 📈 Scalability
+- 🛡️ Automatic backups
+- 🔧 Advanced features
 
-¿Te interesa que implemente la Opción 1 (ChromaDB) ahora?
+Would you like me to implement Option 1 (ChromaDB) now?
+

@@ -474,7 +474,7 @@ async def test_celery_task():
         }
 
 
-@app.post("/message/async")
+@app.post("/message/async", status_code=202)
 async def process_message_async_endpoint(message_dto: MessageDTO):
     """Process message asynchronously using Celery."""
     try:
